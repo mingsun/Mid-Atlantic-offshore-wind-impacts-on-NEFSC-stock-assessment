@@ -1,0 +1,6 @@
+reproducing the abundance indices values for them seem unrealistic
+
+surfclam: I can reproduce all the abundance indices values, but not the error
+quahog: RDtrends works fine, but the other two cannot be estimated
+
+so I just use the ratio (new.indices relative to original indices to adjust all indices in the different scenarios)

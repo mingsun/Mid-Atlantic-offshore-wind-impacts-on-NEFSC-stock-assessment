@@ -1,0 +1,1 @@
+The code in this repository should be used in connection with the other repository from the author "Mid-Atlantic-offshore-wind-impacts-on-NEFSC-surveys", which constructed the abundance indices needed for stock assessment, tested here.

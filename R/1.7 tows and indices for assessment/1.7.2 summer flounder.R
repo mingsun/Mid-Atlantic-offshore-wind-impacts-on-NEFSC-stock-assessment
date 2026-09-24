@@ -92,6 +92,8 @@ mean_N_stratum_df <- read.csv("results/indices for assessment/summer flounder/ca
   mutate(VAR_STRATUM = var(NUMBER), na.rm = TRUE) %>% # variance by stratum, same as last line
   ungroup() 
 
+write.csv(mean_N_stratum_df, "results/indices for assessment/summer flounder/stratum_year.ALB.csv", row.names = FALSE)
+
 stratified_mean_N_df <- mean_N_stratum_df %>%
   select(c(YEAR, SEASON, STRATUM, TOTAL_N_STATION, STRATUM_AREA, MEAN_N_STRATUM, VAR_STRATUM)) %>%
   distinct() %>% # downsize the data frame to a minimal without repetitive rows
@@ -381,6 +383,8 @@ mean_N_stratum_df <- read.csv("results/indices for assessment/summer flounder/ca
   mutate(MEAN_N_STRATUM = mean(NUMBER)) %>% # mean within a strata
   mutate(VAR_STRATUM = var(NUMBER), na.rm = TRUE) %>% # variance by stratum, same as last line
   ungroup() 
+
+write.csv(mean_N_stratum_df, "results/indices for assessment/summer flounder/stratum_year.BIG.csv", row.names = FALSE)
 
 stratified_mean_N_df <- mean_N_stratum_df %>%
   select(c(YEAR, SEASON, STRATUM, TOTAL_N_STATION, STRATUM_AREA, MEAN_N_STRATUM, VAR_STRATUM)) %>%

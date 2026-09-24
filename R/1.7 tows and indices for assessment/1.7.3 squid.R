@@ -24,7 +24,9 @@ mean_N_stratum_df <- full_tow_df %>%
   mutate(MEAN_N_STRATUM = sum(CATCH_WT_CAL, na.rm = TRUE)/TOTAL_N_STATION) %>% # mean within a strata
   mutate(VAR_STRATUM = sum((CATCH_WT_CAL - MEAN_N_STRATUM)^2, na.rm = TRUE)/ (TOTAL_N_STATION - 1)) %>% # variance by stratum
   # mutate(VAR_STRATUM = var(EXPCATCHNUM)) %>% # variance by stratum, same as last line
-  ungroup() 
+  ungroup()
+
+write.csv(mean_N_stratum_df, "results/indices for assessment/squid/stratum_year.csv", row.names = FALSE)
 
 
 ## 2.2 stratified mean numbers ---------------------------------------------------------------------------------------------

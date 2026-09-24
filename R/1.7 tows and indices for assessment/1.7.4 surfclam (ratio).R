@@ -30,21 +30,27 @@ tow_RDtrendS_df <- read.csv("data/NOAA.stock.data/surfclam/TOW_DATA.CSV") %>%
 
 
   ## 1.1 full dataset ----
-RDtrendS_full_df <- tow_RDtrendS_df %>% 
-  mutate(N_per_M2 = TOTALN) %>% # average number per m2
+RDtrendS_stratum_df <- tow_RDtrendS_df %>% 
+  mutate(N_per_M2 = TOTALN) %>%
   group_by(YEAR, STRATUM) %>%
-  summarise(mean_N_per_M2 = mean(N_per_M2, na.rm = TRUE), # average number per m2 by strata
-            VAR_STRATUM = var(N_per_M2, na.rm = TRUE),
-            SD_STRATUM = sqrt(VAR_STRATUM),
-            TOTAL_N_STATION = n(),
-            .groups = "drop") %>%
-  left_join(stra_area_df) %>% # add the area weighting
+  summarise(
+    mean_N_per_M2 = mean(N_per_M2, na.rm = TRUE),
+    VAR_STRATUM = var(N_per_M2, na.rm = TRUE),
+    SD_STRATUM = sqrt(VAR_STRATUM),
+    TOTAL_N_STATION = n(),
+    .groups = "drop")
+
+write.csv(RDtrendS_stratum_df, "results/indices for assessment/surfclam/stratum_year.RDtrendS.csv",  row.names = FALSE)
+
+RDtrendS_full_df <- RDtrendS_stratum_df %>%
+  left_join(stra_area_df) %>%
   group_by(YEAR) %>%
-  summarise(VALUE = weighted.mean(mean_N_per_M2, w = WEIGHT), # stratified mean
-            VAR = sum((WEIGHT^2) * (VAR_STRATUM / TOTAL_N_STATION)), # stratified variance
-            SE = sqrt(VAR),
-            CV = SE/VALUE,
-            log_SE = sqrt(log(1 + CV^2))) 
+  summarise(
+    VALUE = weighted.mean(mean_N_per_M2, w = WEIGHT),
+    VAR = sum((WEIGHT^2) * (VAR_STRATUM / TOTAL_N_STATION)),
+    SE = sqrt(VAR),
+    CV = SE / VALUE,
+    log_SE = sqrt(log(1 + CV^2)))
 
 write.csv(RDtrendS_full_df, "results/indices for assessment/surfclam/original.RDtrendS.csv", row.names = FALSE)
 
@@ -90,6 +96,12 @@ mitigtated_tow_list_df <- read.csv("results/indices for assessment/surfclam/miti
   filter(YEAR <= 2011) 
 
 RDtrendS_MIT.1_df <- tow_RDtrendS_df[match(mitigtated_tow_list_df$ID, tow_RDtrendS_df$ID), ] # upsample the original tow list
+
+# apply observation error to added pseudo-observations
+# errors are already 0 for retained observations
+RDtrendS_MIT.1_df <- RDtrendS_MIT.1_df %>%
+  mutate(TOTALN = pmax(0, TOTALN + mitigtated_tow_list_df$MIT_ERROR_RDtrendS))
+
 
 RDtrendS_MIT.1_df <- RDtrendS_MIT.1_df %>% 
   mutate(N_per_M2 = TOTALN) %>% # average number per m2
@@ -212,6 +224,7 @@ full_mean_N_stratum_df <- catch_by_tow_df %>%
   distinct() %>%
   arrange(YEAR, REGION)
 
+write.csv(full_mean_N_stratum_df, "results/indices for assessment/surfclam/stratum_year.RDscaleS.csv",  row.names = FALSE)
 
   # stratified mean
 full_stratified_mean_N_df <- full_mean_N_stratum_df %>%
@@ -310,6 +323,11 @@ mitigtated_tow_list_df <- read.csv("results/indices for assessment/surfclam/miti
 
 
 catch_by_tow_MIT.1_df <- catch_by_tow_df[match(mitigtated_tow_list_df$ID, catch_by_tow_df$ID), ] # up sample the original tow list
+
+
+# apply observation error to added pseudo-observations
+catch_by_tow_MIT.1_df <- catch_by_tow_MIT.1_df %>%
+  mutate(NPERTOW = pmax(0, NPERTOW + mitigtated_tow_list_df$MIT_ERROR_RDscaleS))
 
 
 # mean abundance by stratum
@@ -484,6 +502,7 @@ MCDS_mean_N_stratum_df <- tow_MCDS_df %>%
   distinct() %>%
   arrange(YEAR, REGION)
 
+write.csv(MCDS_mean_N_stratum_df, "results/indices for assessment/surfclam/stratum_year.MCDS.csv",  row.names = FALSE)
 
   # stratified mean
 MCDS_stratified_mean_N_df <- MCDS_mean_N_stratum_df %>%
@@ -577,6 +596,10 @@ mitigtated_tow_list_df <- read.csv("results/indices for assessment/surfclam/miti
 
 
 tow_MCDS_MIT.1_df <- tow_MCDS_df[match(mitigtated_tow_list_df$ID, tow_MCDS_df$ID), ] # up sample the original tow list
+
+# apply observation error to added pseudo-observations
+tow_MCDS_MIT.1_df <- tow_MCDS_MIT.1_df %>%
+  mutate(NPERTOW = pmax(0, NPERTOW + mitigtated_tow_list_df$MIT_ERROR_MCDS))
 
 
 
